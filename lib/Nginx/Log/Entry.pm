@@ -1,11 +1,11 @@
 package Nginx::Log::Entry;
-
 use strict;
 use warnings;
 use Time::Piece;
 use Nginx::ParseLog;
+use HTTP::BrowserDetect;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 =head1 NAME
 
@@ -34,8 +34,10 @@ Instantiates a new entry object, requires a line from the Nginx access.log as a 
 =cut
 
 sub new {
-    my $class = shift;
-    my $self = Nginx::ParseLog::parse(shift);
+    my ( $class, $log_line ) = @_;
+    die "Error: no log string was passed to new" unless $log_line;
+    my $self = Nginx::ParseLog::parse($log_line);
+    $self->{detector} = HTTP::BrowserDetect->new( $self->{user_agent} );
     return bless $self, $class;
 }
 
@@ -58,9 +60,10 @@ Returns a L<Time::Piece> object of the request datetime.
 
 sub get_datetime_obj {
     my $self = shift;
-    unless (exists $self->{datetime_obj}) {
-        my $date_string = substr($self->{time},0,-6);
-        $self->{datetime_obj} = Time::Piece->strptime($date_string, "%d/%b/%Y:%H:%M:%S");
+    unless ( exists $self->{datetime_obj} ) {
+        my $date_string = substr( $self->{time}, 0, -6 );
+        $self->{datetime_obj} =
+          Time::Piece->strptime( $date_string, "%d/%b/%Y:%H:%M:%S" );
     }
     return $self->{datetime_obj};
 }
@@ -73,7 +76,7 @@ Returns the timezone GMT modifier, e.g. -400.
 
 sub get_timezone {
     my $self = shift;
-    return substr($self->{time},-5);
+    return substr( $self->{time}, -5 );
 }
 
 =head2 was_robot
@@ -84,13 +87,7 @@ Returns 1 if the useragent string was a known robot, else returns 0.
 
 sub was_robot {
     my $self = shift;
-    my @bots = qw/YandexBot Googlebot bingbot Ezooms SurveyBot msnbot NetcraftSurveyAgent ScreenerBot FlightDeckReportsBot Baiduspider NetSeer 
-        panscient.com survey Indy
-        /;
-    foreach my $bot (@bots) {
-        return 1 if $self->{user_agent} =~ /$bot/i;
-    }
-    return 0;
+    return $self->{detector}->robot;
 }
 
 =head2 get_status
@@ -123,7 +120,7 @@ Returns the http request type, e.g. GET.
 
 sub get_request_type {
     my $self = shift;
-    my @request = split(' ', $self->get_request);
+    my @request = split( ' ', $self->get_request );
     return $request[0];
 }
 
@@ -135,7 +132,7 @@ Returns the requested url (excluding the base).
 
 sub get_request_url {
     my $self = shift;
-    my @request = split(' ', $self->get_request);
+    my @request = split( ' ', $self->get_request );
     return $request[1];
 }
 
@@ -147,7 +144,7 @@ Returns http/1 or http/1.1.
 
 sub get_request_http_version {
     my $self = shift;
-    my @request = split(' ', $self->get_request);
+    my @request = split( ' ', $self->get_request );
     return $request[2];
 }
 
@@ -158,9 +155,9 @@ Returns 1 if the http status is a 200 series number (e.g. 200, 201, 202 etc), el
 =cut
 
 sub was_request_successful {
-    my $self = shift;
+    my $self   = shift;
     my $status = $self->get_status;
-    return substr($status,0,1) == 2 ? 1 : 0;
+    return substr( $status, 0, 1 ) == 2 ? 1 : 0;
 }
 
 =head2 get_useragent
@@ -182,19 +179,7 @@ Returns the operating system, e.g. Windows.
 
 sub get_os {
     my $self = shift;
-    my %os = (  Android     => 'Android',
-                Windows     => 'Windows',
-                Macintosh   => 'OSX',
-                Linux       => 'Linux',
-                iPhone      => 'IOS',
-                iPad        => 'IOS',
-                Blackberry  => 'Blackberry',
-                Symbian     => 'Symbian',
-    );
-    foreach my $system (keys %os) {
-        return $os{$system} if $self->get_useragent =~ /$system/i; 
-    }
-    return 'Other';
+    return $self->{detector}->os_string;
 }
 
 =head2 get_browser
@@ -205,17 +190,7 @@ Returns the browser type, e.g. Firefox.
 
 sub get_browser {
     my $self = shift;
-    my %browsers = (    Internet_Explorer => 'msie',
-                        Firefox           => 'firefox',
-                        Chrome            => 'chrome',
-                        Opera             => 'opera',
-                        Safari            => 'safari',
-                        Blackberry        => 'blackberry',
-    );
-    foreach my $browser (keys %browsers) {
-        return $browser if $self->get_useragent =~ /$browsers{$browser}/i; 
-    }
-    return 'Other';
+    return $self->{detector}->browser_string;
 }
 
 =head2 get_referer
@@ -240,7 +215,6 @@ sub get_bytes {
     return $self->{bytes_send};
 }
 
-
 =head2 get_remote_user
 
 Returns the remote username. This is usually not set, and if not, returns '-' instead.
@@ -251,7 +225,6 @@ sub get_remote_user {
     my $self = shift;
     return $self->{remote_user};
 }
-
 
 =head1 AUTHOR
 
@@ -340,4 +313,5 @@ CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
+
 1;

@@ -18,8 +18,9 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Nginx::ParseLog' => 1.01,
-        'Time::Piece'     => 0,
+        'Nginx::ParseLog'       => 1.01,
+        'Time::Piece'           => 0,
+        'HTTP::BrowserDetect'   => 1.55,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Nginx-Log-Entry-*' },

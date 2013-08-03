@@ -18,7 +18,8 @@ no_index:
     - t
     - inc
 requires:
+  HTTP::BrowserDetect: 1.55
   Nginx::ParseLog: 1.01
   Time::Piece: 0
   perl: 5.006
-version: 0.03
+version: 0.04
