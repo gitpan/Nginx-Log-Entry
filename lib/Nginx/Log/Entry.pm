@@ -5,11 +5,11 @@ use Time::Piece;
 use Nginx::ParseLog;
 use HTTP::BrowserDetect;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 =head1 NAME
 
-Nginx::Log::Entry - This class represents a single line from the Nginx combined access log (the default access log format). It provides methods to extract information from the log entry, such as the browser, operating system, request type, ip address and more. If you want to gather statistics about an Nginx log, consider using L<Nging::Log::Statistics> which uses this class.
+Nginx::Log::Entry - This class represents a single line from the Nginx combined access log (the default access log format). It provides methods to extract information from the log entry, such as the browser, operating system, request type, ip address and more. If you want to gather statistics about an Nginx log, consider using L<Nginx::Log::Statistics> which uses this class.
 
 =cut
 
@@ -228,16 +228,13 @@ sub get_remote_user {
 
 =head1 AUTHOR
 
-David Farrell, C<< <davidnmfarrell at gmail.com> >>
+David Farrell, C<< <davidnmfarrell at gmail.com> >>, L<perltricks.com|http://perltricks.com>
 
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-nginx-log-statistics at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Nginx-Log-Entry>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 

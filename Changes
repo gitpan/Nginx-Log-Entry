@@ -1,5 +1,8 @@
 Revision history for Nginx-Log-Entry
 
+0.05    2013/11/17
+        -Updated POD.
+
 0.04    03/08/2013
         -Updated to use HTTP::BrowserDetect for all user agent string related functions.
         -Updated Makefile.PL to include HTTP::BrowserDetect functionality.

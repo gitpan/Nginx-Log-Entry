@@ -1,5 +1,5 @@
 ---
-abstract: 'This class represents a single line from the Nginx combined access log (the default access log format). It provides methods to extract information from the log entry, such as the browser, operating system, request type, ip address and more. If you want to gather statistics about an Nginx log, consider using L<Nging::Log::Statistics> which uses this class.'
+abstract: 'This class represents a single line from the Nginx combined access log (the default access log format). It provides methods to extract information from the log entry, such as the browser, operating system, request type, ip address and more. If you want to gather statistics about an Nginx log, consider using L<Nginx::Log::Statistics> which uses this class.'
 author:
   - 'David Farrell <davidnmfarrell@gmail.com>'
 build_requires:
@@ -22,4 +22,4 @@ requires:
   Nginx::ParseLog: 1.01
   Time::Piece: 0
   perl: 5.006
-version: 0.04
+version: 0.05
